@@ -1,0 +1,433 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>2048</title>
+	<style>
+	body{
+		margin: auto auto auto auto;
+		/*background-color: #202020;*/
+		background-color: #000000;
+		font-family: 微軟正黑體;
+		font-weight: 500;
+		text-align: center;
+		color: #ffffff;
+	}
+	table{
+		margin: 10px auto auto auto;
+		background-color: rgba(255, 255, 255, 0.1);
+		color: #000000;
+	}
+	td{
+		border-style: solid;
+		border-color: rgba(0, 0, 0, 0);
+		margin: 10px 10px 10px 10px;
+		float: left;
+		width: 120px;
+		height: 120px;
+		font-family: 微軟正黑體;
+		font-size: 3em;
+		font-weight: 500;
+		line-height: 120px;
+	}
+	div#container{
+		margin: auto auto auto auto;
+		//width: 100%;
+		width: 605px;
+		height: 605px;
+	}
+	div#messageZone{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		margin: auto auto auto auto;
+		width: 100%;
+		height: 100%;
+	}
+	button{
+		background-color: rgba(255, 255, 255, 0.9);
+		border-style: none;
+		text-align: center;
+		font-family: 微軟正黑體;
+		font-size: 1em;
+		font-weight: 500;
+		margin: auto 10px auto auto;
+		width: 100px;
+		height: 50px;
+	}
+	h1{
+		margin: 10px auto auto auto;
+		font-size: 3em;
+		color: rgba(255, 255, 255, 0.9);
+	}
+	h1#message{
+		margin: 350px auto auto auto;
+		font-size: 3.5em;
+		color: #202020;
+	}
+	.messageZone_win{
+		background-color: rgba(30, 144, 255, 0.6);
+		visibility: visible;
+		transition: all linear .5s;
+		-webkit-transition: all linear .5s;
+	}
+	.messageZone_lose{
+		background-color: rgba(204, 0, 0, 0.6);
+		visibility: visible;
+		transition: all linear .5s;
+		-webkit-transition: all linear .5s;
+	}
+	.messageZone_end{
+		background-color: rgba(255, 255, 255, 0.5);
+		transition: all linear .5s;
+		-webkit-transition: all linear .5s;
+	}
+	.messageZone_hide{
+		background-color: rgba(0, 0, 0, 0);
+		transition: all linear .5s;
+		-webkit-transition: all linear .5s;
+	}
+	.max2{
+		background-color: rgb(15, 15, 15);
+		transition: all linear .5s;
+		-webkit-transition: all linear .5s;
+	}
+	.max4{
+		background-color: rgb(39, 39, 39);
+		transition: all linear 1s;
+		-webkit-transition: all linear 1s;
+	}
+	.max8{
+		background-color: rgb(63, 63, 63);
+		transition: all linear 1s;
+		-webkit-transition: all linear 1s;
+	}
+	.max16{
+		background-color: rgb(87, 87, 87);
+		transition: all linear 1s;
+		-webkit-transition: all linear 1s;
+	}
+	.max32{
+		background-color: rgb(111, 111, 111);
+		transition: all linear 1s;
+		-webkit-transition: all linear 1s;
+	}
+	.max64{
+		background-color: rgb(135, 135, 135);
+		transition: all linear 1s;
+		-webkit-transition: all linear 1s;
+	}
+	.max128{
+		background-color: rgb(159, 159, 159);
+		transition: all linear 1s;
+		-webkit-transition: all linear 1s;
+	}
+	.max256{
+		background-color: rgb(183, 183, 183);
+		transition: all linear 1s;
+		-webkit-transition: all linear 1s;
+	}
+	.max512{
+		background-color: rgb(207, 207, 207);
+		transition: all linear 1s;
+		-webkit-transition: all linear 1s;
+	}
+	.max1024{
+		background-color: rgb(231, 231, 231);
+		transition: all linear 1s;
+		-webkit-transition: all linear 1s;
+	}
+	.max2048{
+		background-color: rgb(255, 255, 255);
+		transition: all linear 1s;
+		-webkit-transition: all linear 1s;
+	}
+	</style>
+</head>
+<body>
+	<h1>2048</h1>
+	<div id='messageZone'>
+		<h1 id='message'></h1>
+		<button type='button' onclick='
+			document.getElementById("messageZone").className = "messageZone_hide";
+			init();
+		' id="btn1">New game</button>
+		<button type='button' onclick='
+			document.getElementById("messageZone").className = "messageZone_hide";
+			document.getElementById("messageZone").style.visibility = "hidden";
+			win ++; 
+			btnHide();
+		' id="btn2">continue</button>
+	</div>
+	<div id='container'>
+		<table id=\'game\'>
+		</table>
+	</div>
+	<script>
+var table = [];
+var win = 0;
+var lose = false;
+var cheats = 0;
+
+function init(){
+	if (window.addEventListener) {
+		window.addEventListener("keyup", keyup);	
+	} else if (window.attachEvent) {
+		document.attachEvent("onkeyup", keyup);
+	} else {
+		window.onkeyup = keyup;
+	}
+
+	var output = '';
+	output += "<table id=\'game\'>";
+	for(var i = 0; i < 4; i ++){
+		table[i] = [];
+		for(var j = 0; j < 4; j ++)
+			table[i][j] = 0;
+	}
+	for(var i = 0; i < 4; i ++){
+		output += "<tr>";
+		for(var j = 0; j < 4; j ++){
+			output += "<td id=\'r"+i+"c"+j+"\'></td>";
+		}
+		output += "</tr>";
+	}
+	output += "</table>";
+	document.getElementById('container').innerHTML = output;
+	document.getElementById("game").className = "max2";
+	btnHide();
+	document.getElementById("messageZone").style.visibility = "hidden";
+	add();
+	add();
+	win = 0;
+	lose = false;
+	draw();
+}
+
+function btnHide(){
+	document.getElementById("btn1").style.visibility = "hidden";
+	document.getElementById("btn2").style.visibility = "hidden";
+}
+
+var KEYBOARD = {left: 37, right: 39, up: 38, down: 40};
+
+init();
+
+function add(){
+	var place = false;
+	for(var i = 0; i < 4; i ++){
+		for(var j = 0; j < 4; j ++)
+			if(!table[i][j]) place = true;
+	}
+	//if(!place) alert("gameover");
+	var new_NUM = (Math.random() > 0.5)? 4 : 2, pos = Math.floor(Math.random() * 16);
+	while(table[Math.floor(pos / 4)][pos % 4]) pos = Math.floor(Math.random() * 16);
+	table[Math.floor(pos / 4)][pos % 4] = new_NUM;
+}
+
+function process(tmp){
+	var change = false;
+	for(var k = 0; k < 4; k ++){
+		if(!tmp[k]){
+			for(var l = k+1; l < 4; l ++)
+				if(tmp[l]){
+					tmp[k] = tmp[l];
+					tmp[l] = 0;
+					change = true;
+					break;
+				}
+		}
+		for(var l = k+1; l < 4; l ++)
+			if(tmp[l]){
+				if(tmp[l] == tmp[k]){
+					tmp[k] += tmp[l];
+					tmp[l] = 0;
+					change = true;
+				}
+				break;
+			}
+	}
+	return change;
+}
+
+function check(){
+	for(var i = 0; i < 4; i ++)
+		for(var j = 0; j < 4; j ++){
+			if(!table[i][j]) return true;
+		}
+	for(var i = 0; i < 4; i ++)
+		for(var j = 0; j < 3; j ++){
+			if(table[i][j] == table[i][j+1]) return true;
+			if(table[j][i] == table[j+1][i]) return true;
+		}
+	/*win = 1;
+	setTimeout(function(){ alert("GG"); }, 2500);*/
+	return false;
+}
+
+function findMAX(){
+	var max = 0;
+	for(var i = 0; i < 4; i ++)
+		for(var j = 0; j < 4; j ++){
+			if(table[i][j] > max) max = table[i][j];
+		}
+	return max;
+}
+
+function Move(dir){
+	var moved = false;
+	switch(dir){
+		case KEYBOARD.left: //left
+			for(var i = 0; i < 4; i ++){
+				var tmp = [];
+				for(var j = 0; j < 4; j ++) tmp[j] = table[i][j];
+				if(!moved) moved = process(tmp);
+				else process(tmp);
+				for(var j = 0; j < 4; j ++) table[i][j] = tmp[j];
+			}
+		break;
+		case KEYBOARD.up: //up
+			for(var i = 0; i < 4; i ++){
+				var tmp = [];
+				for(var j = 0; j < 4; j ++) tmp[j] = table[j][i];
+				if(!moved) moved = process(tmp);
+				else process(tmp);
+				for(var j = 0; j < 4; j ++) table[j][i] = tmp[j];
+			}
+		break;
+		case KEYBOARD.right: //right
+			for(var i = 0; i < 4; i ++){
+				var tmp = [];
+				for(var j = 0; j < 4; j ++) tmp[j] = table[i][3-j];
+				if(!moved) moved = process(tmp);
+				else process(tmp);
+				for(var j = 0; j < 4; j ++) table[i][3-j] = tmp[j];
+			}
+		break;
+		case KEYBOARD.down: //down
+			for(var i = 0; i < 4; i ++){
+				var tmp = [];
+				for(var j = 0; j < 4; j ++) tmp[j] = table[3-j][i];
+				if(!moved) moved = process(tmp);
+				else process(tmp);
+				for(var j = 0; j < 4; j ++)table[3-j][i] = tmp[j];
+			}
+		break;
+	}
+	
+	if(moved){
+		add();
+		draw();
+		if(!win && findMAX() >= 2048){
+			win = 1;
+			//setTimeout(function(){ alert("win"); }, 1500);
+			document.getElementById("messageZone").style.visibility = "visible";
+			document.getElementById("btn1").style.visibility = "visible";
+			document.getElementById("btn2").style.visibility = "visible";
+			document.getElementById("messageZone").className = "messageZone_win";
+			document.getElementById("message").innerHTML = "You win!";
+		}
+		else if(!check()){
+			lose = true;
+			//setTimeout(function(){ alert("GG"); }, 2500);
+			document.getElementById("messageZone").style.visibility = "visible";
+			document.getElementById("btn1").style.visibility = "visible";
+			if(win > 1) document.getElementById("messageZone").className = "messageZone_end";
+			else document.getElementById("messageZone").className = "messageZone_lose";
+			document.getElementById("message").innerHTML = "Game Over!";
+		}
+	}
+}
+//50/48/52/56
+function keyup(e){
+	e = e || window.event;
+	if(win == 1 || lose) return;
+	switch(e.keyCode){
+		case KEYBOARD.left: //left
+			Move(KEYBOARD.left);
+			cheats = 0;
+			break;
+		case KEYBOARD.up: //up
+			Move(KEYBOARD.up);
+			cheats = 0;
+			break;
+		case KEYBOARD.right: //right
+			Move(KEYBOARD.right);
+			cheats = 0;
+			break;
+		case KEYBOARD.down: //down
+			Move(KEYBOARD.down);
+			cheats = 0;
+			break;
+		case 50:
+			if(cheats == 0){
+				cheats ++;
+				console.log("2!!");
+			}
+			else cheats = 0;
+			break;
+		case 48:
+			if(cheats == 1){
+				cheats ++;
+				console.log("0!!");
+			}
+			else cheats = 0;
+			break;
+		case 52:
+			if(cheats == 2){
+				cheats ++;
+				console.log("4!!");
+			}
+			else cheats = 0;
+			break;
+		case 56:
+			if(cheats == 3){
+				console.log("8!!");
+				table[3][3] = 1024;
+				table[3][2] = 1024;
+				draw();
+			}
+			else cheats = 0;
+			break;
+		case 76:
+			table = [[4,4,16,128],[256,2,1024,64],[2,256,16,2],[256,2,1024,8]];
+			draw();
+			break;
+		default:
+			cheats = 0;
+			break;
+	}
+}
+
+function draw(){
+	for(var i = 0; i < 4; i ++){
+		for(var j = 0; j < 4; j ++){
+			var current_box = document.getElementById("r"+i+"c"+j);
+			if(table[i][j]){
+				var tmp = 15 + (Math.log2(table[i][j]) - 1) * 24;
+				if(tmp > 255) tmp = 255;
+				current_box.innerHTML = table[i][j];
+				if(table[i][j] == 2){
+					current_box.style.color = "#aaaaaa";
+					current_box.style.borderColor = "rgba(255, 255, 255, 0.2)";
+				}
+				else{
+					current_box.style.color = "#000000";
+					current_box.style.borderColor = "rgba(0, 0, 0, 0.3)";
+				}
+				//console.log(current_box.style);
+				current_box.style.backgroundColor = "rgba("+tmp+", "+tmp+", "+tmp+", 0.85)";
+			}
+			else{
+				current_box.innerHTML = "";
+				current_box.style.borderColor = "rgba(0, 0, 0, 0)";
+				current_box.style.backgroundColor = "rgba(0, 0, 0, 0.95)";
+			}
+		}
+	}
+	var board = document.getElementById("game");
+	document.getElementById("game").className = "max"+findMAX();
+}
+	</script>
+</body>
+</html>
